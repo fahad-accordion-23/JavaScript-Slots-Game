@@ -94,7 +94,7 @@ function spin()
 
         for (let j = 0; j < COLS; j++)
         {
-            const randomIndex = Math.floor(Math.random() * reels.length);
+            const randomIndex = Math.floor(Math.random() * symbols.length);
             reels[i][j] = symbols[randomIndex];
             symbols.splice(randomIndex, 1);
         }
@@ -103,12 +103,8 @@ function spin()
     return reels;
 }
 
-function main()
-{
-    var balance = getDepositAmount();
-    var numberOfLines = getNumberOfLines();
-    var bet = getBetAmount(balance, numberOfLines);
-    const reels = spin();
-}
-
-main();
+// Program Execution
+var balance = getDepositAmount();
+var numberOfLines = getNumberOfLines();
+var bet = getBetAmount(balance, numberOfLines);
+const reels = spin();
