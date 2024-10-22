@@ -7,9 +7,9 @@
 *   User inputs number of lines to bet on          |  Completed
 *   Betting amount is deducted from user account   |  Completed
 *   The slot machine is spinned                    |  Completed
-*   Win condition                                  |  Working...
-*   Give or take based on win condition            |  Pending...
-*   Restart                                        |  Pending...
+*   Win condition                                  |  Completed
+*   Give or take based on win condition            |  Completed
+*   Restart                                        |  Completed
 */
 
 const prompt = require("prompt-sync")();
@@ -48,7 +48,7 @@ function getNumberOfLines()
 {
     while (true)
     {
-        var numberOfLines = parseFloat(prompt("Enter the number of lines (1-3): "));
+        var numberOfLines = parseFloat(prompt("Enter the number of lines (1 - " + COLS + "): "));
 
         if (isNaN(numberOfLines) || numberOfLines <= 0 || numberOfLines > 3)
         {
@@ -103,8 +103,69 @@ function spin()
     return reels;
 }
 
+function getWinningsAmount(reels, bet)
+{
+    /* Check for each horizontal row (display row is different from array row)
+    * whether the row is complete. If complete then add to winnings pool. */
+    let winnings = 0;
+    for (let i = 0; i < COLS; i++)
+    {
+        let isComplete = true;
+        for (let j = 1; j < ROWS; j++)
+        {
+            if (reels[j][i] != reels[0][i])
+            {
+                isComplete = false;
+                break;
+            }
+        }
+
+        if (isComplete)
+        {
+            winnings += bet * SYMBOL_VALUES[reels[0][i]]; 
+        }
+    }
+
+    return winnings;
+}
+
 // Program Execution
 var balance = getDepositAmount();
-var numberOfLines = getNumberOfLines();
-var bet = getBetAmount(balance, numberOfLines);
-const reels = spin();
+
+while (true)
+{
+    if (balance <= 0)
+    {
+        console.log("You have run out of money!");
+        break;
+    }
+
+    let numberOfLines = getNumberOfLines();
+    let betAmount = getBetAmount(balance, numberOfLines);
+    const reels = spin();
+    let winnings = getWinningsAmount(reels, betAmount);
+    
+    balance -= betAmount * numberOfLines;
+    balance += winnings;
+
+    for (let i = 0; i < COLS; i++)
+    {
+        let printString = "";
+        for (let j = 0; j < ROWS; j++)
+        {
+            printString += reels[j][i] + " ";
+        }
+    
+        console.log(printString);
+    }
+
+    console.log("You won: $" + winnings);
+    console.log("Balance: $" + balance + " = $" + winnings + " - $" + betAmount * numberOfLines);
+    
+
+    let userChoice = prompt("Do you wish to play again? (Y for Yes): ");
+    if (userChoice == 'Y')
+        continue;
+    else
+        break;
+}
